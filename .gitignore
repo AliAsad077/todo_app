@@ -1,0 +1,8 @@
+myenv/
+myenv/*
+!myenv/bin/
+!myenv/Lib/
+!myenv/Scripts/
+*.db
+*.sqlite3
+*.log

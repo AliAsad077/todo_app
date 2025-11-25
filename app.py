@@ -11,7 +11,7 @@ app = Flask(__name__)
 # SQLite database ka file todo.db banayega
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24).hex())
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-please-change-in-production')
 
 db = SQLAlchemy(app)
 
@@ -219,8 +219,9 @@ def update(id):
         except Exception as e:
             return f'An error occurred while updating the task: {e}'
     else:
-        # GET request par update page dikhayen
-        return render_template('index.html', task=task)
+        # GET request par update page dikhayen with user's tasks
+        tasks = Todo.query.filter_by(user_id=current_user.id).order_by(Todo.date_created).all()
+        return render_template('index.html', task=task, tasks=tasks)
 
 # --------------- App Run ---------------
 if __name__ == "__main__":

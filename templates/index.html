@@ -2,111 +2,529 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Simple Flask To-Do List app</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My To-Do List - Todo App</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Bootstrap CDN for styling -->
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
           integrity="sha384-JcKb8q3iqJ61gNVWv6fj2eWlDz0POfb2V5i xRwxmP4YfRvH+8abtTE1Pi6jizo"
           crossorigin="anonymous">
     <style>
-        /* Custom styling thori si spacing aur centering ke liye */n
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #f8f9fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
         }
+
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 12px 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .navbar-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .navbar-logo i {
+            font-size: 18px;
+            color: white;
+        }
+
+        .navbar-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #4b5563;
+            font-size: 14px;
+        }
+
+        .user-info i {
+            color: #667eea;
+        }
+
+        .user-info span {
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .logout-btn:hover {
+            color: white;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+
         .todo-card {
-            max-width: 600px;
-            margin: 50px auto;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-radius: 8px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
         }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .todo-header {
-            background-color: #343a40;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
+            padding: 28px 32px;
+            text-align: center;
         }
-        .table thead th {
-            background-color: #6c757d;
+
+        .todo-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .todo-header p {
+            margin: 8px 0 0;
+            opacity: 0.9;
+            font-size: 15px;
+        }
+
+        .card-body {
+            padding: 32px;
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .flash-message.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .flash-message.success {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+
+        .flash-message.info {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+        }
+
+        .task-form {
+            margin-bottom: 24px;
+        }
+
+        .input-group-custom {
+            display: flex;
+            gap: 12px;
+        }
+
+        .input-group-custom input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: #f9fafb;
+        }
+
+        .input-group-custom input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
         }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-update:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .tasks-container {
+            background: #f9fafb;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .tasks-header {
+            background: #667eea;
+            color: white;
+            padding: 16px 20px;
+            display: grid;
+            grid-template-columns: 50px 1fr 140px 140px;
+            gap: 16px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .task-item {
+            display: grid;
+            grid-template-columns: 50px 1fr 140px 140px;
+            gap: 16px;
+            padding: 16px 20px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .task-item:hover {
+            background: #f8fafc;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-number {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .task-content {
+            font-size: 15px;
+            color: #1a1a2e;
+            word-break: break-word;
+        }
+
+        .task-date {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-edit {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+        }
+
+        .btn-edit:hover {
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-delete {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+            color: white;
+            text-decoration: none;
+        }
+
         .no-tasks {
-            color: #6c757d;
+            padding: 48px 20px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .no-tasks i {
+            font-size: 48px;
+            color: #d1d5db;
+            margin-bottom: 16px;
+        }
+
+        .no-tasks p {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-custom {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+
+            .tasks-header {
+                display: none;
+            }
+
+            .task-item {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .task-number {
+                display: none;
+            }
+
+            .task-actions {
+                justify-content: flex-start;
+            }
+
+            .input-group-custom {
+                flex-direction: column;
+            }
+
+            .user-section {
+                flex-direction: column;
+                gap: 12px;
+            }
         }
     </style>
 </head>
 <body>
-<div class="todo-card card">
-    <div class="card-header text-center todo-header">
-        <h2 class="mb-0">My To-Do List</h2>
-    </div>
-    <div class="card-body">
-
-        <!-- Agar update karna hai to ye form show hoga -->
-        {% if task %}
-        <div class="mb-4">
-            <form method="POST">
-                <div class="input-group">
-                    <input type="text" name="content" class="form-control"
-                           value="{{ task.content }}" placeholder="Update your task">
-                    <div class="input-group-append">
-                        <button class="btn btn-primary" type="submit">Update</button>
-                    </div>
-                </div>
-            </form>
+    <nav class="navbar-custom">
+        <a href="{{ url_for('index') }}" class="navbar-brand">
+            <div class="navbar-logo">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <span class="navbar-title">Todo App</span>
+        </a>
+        <div class="user-section">
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span>{{ current_user.username }}</span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
         </div>
-        {% endif %}
+    </nav>
 
-        <!-- Naya task add karne ka form -->
-        {% if not task %}
-        <div class="mb-4">
-            <form method="POST">
-                <div class="input-group">
-                    <input type="text" name="content" class="form-control"
-                           placeholder="Enter a new task" autocomplete="off">
-                    <div class="input-group-append">
-                        <button class="btn btn-success" type="submit">Add Task</button>
-                    </div>
-                </div>
-            </form>
+    <div class="todo-card">
+        <div class="todo-header">
+            <h2>My To-Do List</h2>
+            <p>Stay organized and productive</p>
         </div>
-        {% endif %}
+        <div class="card-body">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">
+                                {% if category == 'error' %}
+                                    <i class="fas fa-exclamation-circle"></i>
+                                {% elif category == 'success' %}
+                                    <i class="fas fa-check-circle"></i>
+                                {% else %}
+                                    <i class="fas fa-info-circle"></i>
+                                {% endif %}
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
 
-        <!-- Tasks ko table mein list karen -->
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th style="width: 10%;">#</th>
-                    <th style="width: 50%;">Task</th>
-                    <th style="width: 25%;">Date Created</th>
-                    <th style="width: 15%;">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
+            <!-- Agar update karna hai to ye form show hoga -->
+            {% if task %}
+            <div class="task-form">
+                <form method="POST" class="input-group-custom">
+                    <input type="text" name="content" 
+                           value="{{ task.content }}" placeholder="Update your task" autocomplete="off">
+                    <button class="btn-update" type="submit">
+                        <i class="fas fa-save"></i>
+                        Update Task
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- Naya task add karne ka form -->
+            {% if not task %}
+            <div class="task-form">
+                <form method="POST" class="input-group-custom">
+                    <input type="text" name="content" 
+                           placeholder="What needs to be done?" autocomplete="off">
+                    <button class="btn-add" type="submit">
+                        <i class="fas fa-plus"></i>
+                        Add Task
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- Tasks ko list karen -->
+            <div class="tasks-container">
+                <div class="tasks-header">
+                    <span>#</span>
+                    <span>Task</span>
+                    <span>Created</span>
+                    <span>Actions</span>
+                </div>
                 {% for t in tasks %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td>{{ t.content }}</td>
-                        <td>{{ t.date_created.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                        <td>
-                            <!-- Update aur Delete buttons -->
-                            <a href="{{ url_for('update', id=t.id) }}"
-                               class="btn btn-sm btn-info mr-1">Update</a>
-                            <a href="{{ url_for('delete', id=t.id) }}"
-                               class="btn btn-sm btn-danger">Delete</a>
-                        </td>
-                    </tr>
+                    <div class="task-item">
+                        <div class="task-number">{{ loop.index }}</div>
+                        <div class="task-content">{{ t.content }}</div>
+                        <div class="task-date">{{ t.date_created.strftime('%b %d, %Y') }}</div>
+                        <div class="task-actions">
+                            <a href="{{ url_for('update', id=t.id) }}" class="btn-action btn-edit">
+                                <i class="fas fa-edit"></i>
+                                Edit
+                            </a>
+                            <a href="{{ url_for('delete', id=t.id) }}" class="btn-action btn-delete">
+                                <i class="fas fa-trash"></i>
+                                Delete
+                            </a>
+                        </div>
+                    </div>
                 {% else %}
-                    <tr>
-                        <td colspan="4" class="text-center no-tasks">No tasks yet. Add one!</td>
-                    </tr>
+                    <div class="no-tasks">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>No tasks yet. Add one to get started!</p>
+                    </div>
                 {% endfor %}
-                </tbody>
-            </table>
+            </div>
         </div>
-
     </div>
-</div>
 
 <!-- Bootstrap JS dependencies (optional) -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
